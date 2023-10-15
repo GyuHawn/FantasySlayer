@@ -10,7 +10,6 @@ public class HeroKnight : MonoBehaviour
     [SerializeField] bool m_noBlood = false;
     [SerializeField] GameObject m_slideDust;
 
-
     private Animator m_animator;
     private Rigidbody2D m_body2d;
     private Sensor_HeroKnight m_groundSensor;
@@ -28,7 +27,8 @@ public class HeroKnight : MonoBehaviour
     private float m_delayToIdle = 0.0f;
     private float m_rollDuration = 8.0f / 14.0f;
     private float m_rollCurrentTime;
-
+    public float climbSpeed = 5f;
+    private bool isClimbing = false;
 
     void Start()
     {
@@ -94,11 +94,11 @@ public class HeroKnight : MonoBehaviour
         m_animator.SetBool("WallSlide", m_isWallSliding);
 
         // 사망
-       /* if (Input.GetKeyDown("e") && !m_rolling)
-        {
-            m_animator.SetBool("noBlood", m_noBlood);
-            m_animator.SetTrigger("Death");
-        }*/
+        /* if (Input.GetKeyDown("e") && !m_rolling)
+         {
+             m_animator.SetBool("noBlood", m_noBlood);
+             m_animator.SetTrigger("Death");
+         }*/
 
         // 피격
         /*else if (Input.GetKeyDown("q") && !m_rolling)
@@ -175,6 +175,14 @@ public class HeroKnight : MonoBehaviour
             if (m_delayToIdle < 0)
                 m_animator.SetInteger("AnimState", 0);
         }
+
+        // 사다리
+        if (isClimbing)
+        {
+            float verticalInput = Input.GetAxis("Vertical");
+            m_body2d.velocity = new Vector2(m_body2d.velocity.x, verticalInput * climbSpeed);
+            m_animator.SetInteger("AnimState", 1); // 삭제 확인
+        }
     }
 
     // 슬라이드 애니메이션에서 호출됩니다.
@@ -195,4 +203,23 @@ public class HeroKnight : MonoBehaviour
             dust.transform.localScale = new Vector3(m_facingDirection, 1, 1);
         }
     }
-}
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Ladder")
+        {
+            isClimbing = true;
+            m_body2d.gravityScale = 0;  // 중력 영향 제거
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.tag == "Ladder")
+        {
+            isClimbing = false;
+            m_body2d.gravityScale = 1;  // 중력 영향 복구
+            m_animator.SetInteger("AnimState", 0);
+        }
+    }
+}   
