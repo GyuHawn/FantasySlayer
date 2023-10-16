@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Threading;
 
 public class HeroKnight : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class HeroKnight : MonoBehaviour
     private float m_rollCurrentTime;
     public float climbSpeed = 5f;
     private bool isClimbing = false;
+    public int m_attackDamage = 20;
 
     void Start()
     {
@@ -204,6 +206,25 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
+    /*void AE_Attack()
+    {
+        float attackRange = 1f;
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, new Vector2(m_facingDirection, 0), attackRange);
+
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.transform != null && ((1 << hit.transform.gameObject.layer) & LayerMask.GetMask("Skeleton", "Mushroom")) != 0)
+            {
+                MonsterController monsterScript = hit.transform.GetComponent<MonsterController>();
+                if (monsterScript != null)
+                {
+                    monsterScript.TakeDamage(m_attackDamage);
+                }
+            }
+        }
+    }
+*/
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Ladder")
