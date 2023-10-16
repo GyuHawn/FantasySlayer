@@ -2,78 +2,70 @@ using UnityEngine;
 
 public class MonsterController : MonoBehaviour
 {
-    private Animator animator;
-    private bool isAttacking;
-    private bool isWalking;
+    public int nextMove;
 
-    private void Start()
+    private Rigidbody2D rigid;
+    private Animator anim;
+
+    private void Awake()
     {
-        animator = GetComponent<Animator>();
-        isAttacking = false;
-        isWalking = false;
+        rigid = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+
+        Invoke("Think", 2);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        // 공격 상태인 경우
-        if (isAttacking)
+        // 이동
+        rigid.velocity = new Vector2(nextMove, rigid.velocity.y);
+
+        // 플랫폼 확인
+        Vector2 frontVec = new Vector2(rigid.position.x + nextMove, rigid.position.y);
+        Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
+        RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 2, LayerMask.GetMask("Floor"));
+
+        if (rayHit.collider == null)
         {
-            // 공격2 애니메이션으로 전환
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
-            {
-                animator.SetTrigger("Attack2");
-            }
-            // 공격 상태가 끝났을 때 기본자세로 전환
-            else if (!animator.IsInTransition(0) && animator.GetCurrentAnimatorStateInfo(0).IsName("Attack2"))
-            {
-                animator.SetTrigger("Idle");
-                isAttacking = false;
-            }
+            nextMove *= -1;
+            CancelInvoke();
+            Invoke("Think", 10);
         }
 
-        // 피격 상태인 경우
-        else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
+        // 움직임에 따른 애니메이션 상태 변경
+        if (nextMove != 0)
         {
-            // 피격 상태가 끝났을 때 기본자세로 전환
-            if (!animator.IsInTransition(0))
-            {
-                animator.SetTrigger("Idle");
-            }
+            anim.SetInteger("AnimState", 1); // 이동 중일 때 AnimState는 '1'
+            if (nextMove == -1)
+                transform.eulerAngles = new Vector3(0, 180, 0);
+            else if (nextMove == 1)
+                transform.eulerAngles = new Vector3(0, 0, 0);
         }
-
-        // 걷기 상태인 경우, 걷기 애니메이션 재생 중일 때에도 계속해서 이동하도록 구현할 수 있습니다.
-        else if (isWalking || animator.GetCurrentAnimatorStateInfo(0).IsName("Walk"))
+        else
         {
-            Move();
-        }
-
-        // 사망 상태인 경우 추가하고 싶은 로직을 작성할 수 있습니다.
-        //animator.SetTrigger("Death");
-    }
-
-    public void Attack()
-    {
-        if (!isAttacking)
-        {
-            isAttacking = true;
-            animator.SetTrigger("Attack1");
+            anim.SetInteger("AnimState", 0); // 정지했을 때 AnimState는 '0'
         }
     }
 
-    public void TakeDamage()
+    // 재귀함수
+    void Think()
     {
-        animator.SetTrigger("Hit");
-    }
+        nextMove = Random.Range(-1, 2);
 
-    public void Walk(bool shouldWalk)
-    {
-        isWalking = shouldWalk;
-        animator.SetBool("Walk", shouldWalk);
-    }
+        float nextThinkTime = Random.Range(2f, 5f);
+        Invoke("Think", nextThinkTime);
 
-    private void Move()
-    {
-        // 몬스터 이동 로직 구현하기 
-        // 예시: transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+        if (nextMove != 0)
+        {
+            anim.SetInteger("AnimState", 1);
+            if (nextMove == -1)
+                transform.eulerAngles = new Vector3(0, 180, 0);
+            else if (nextMove == 1)
+                transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+        else
+        {
+            anim.SetInteger("AnimState", 0);
+        }
     }
 }
