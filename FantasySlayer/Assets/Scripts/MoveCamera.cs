@@ -5,13 +5,26 @@ using UnityEngine;
 public class MoveCamera : MonoBehaviour
 {
     public GameObject player;
-    public Vector2 offset; // Keep this as Vector2
+    public Vector2 offset;
+
+    private bool checkPlayer = false;
 
     void Update()
     {
-        // Create a new Vector3 using x and y from offset and z from current camera position.
+        if (player == null && !checkPlayer)
+        {
+            PlayerCheck();
+            checkPlayer = true;
+        }
+
         transform.position = new Vector3(player.transform.position.x + offset.x,
                                          player.transform.position.y + offset.y,
                                          transform.position.z);
+    }
+
+    void PlayerCheck()
+    {
+        player = GameObject.Find("Player");
+
     }
 }

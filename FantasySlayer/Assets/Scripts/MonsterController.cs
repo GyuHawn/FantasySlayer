@@ -26,7 +26,7 @@ public class MonsterController : MonoBehaviour
         maxHealth = 100;
         currentHealth = 100;
 
-        Invoke("Think", 0);
+        Invoke("Think", 2);
     }
 
     private void FixedUpdate()
@@ -38,6 +38,7 @@ public class MonsterController : MonoBehaviour
         Vector2 frontVec = new Vector2(rigid.position.x + nextMove, rigid.position.y);
         Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
         RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 2, LayerMask.GetMask("Floor"));
+
         if (rayHit.collider == null)
         {
             nextMove *= -1;
@@ -45,8 +46,8 @@ public class MonsterController : MonoBehaviour
             Invoke("Think", 5);
         }
 
-        // RaycastHit2D rayHitPlayer = Physics2D.Raycast(frontVec, transform.right * nextMove, 1f, LayerMask.GetMask("Player"));
-        RaycastHit2D rayHitPlayer = Physics2D.Raycast(frontVec, Vector3.down, 2, LayerMask.GetMask("Player"));
+        RaycastHit2D rayHitPlayer = Physics2D.Raycast(frontVec, Vector3.down, 1f, LayerMask.GetMask("Player"));
+
         if (rayHitPlayer.collider != null && Time.time >= lastAttackTime + attackDelay)
         {
             Attack();
@@ -60,68 +61,65 @@ public class MonsterController : MonoBehaviour
                 transform.eulerAngles = new Vector3(0, 180, 0);
             else if (nextMove == 1)
                 transform.eulerAngles = new Vector3(0, 0, 0);
+
         }
         else
-        {
             anim.SetInteger("AnimState", 0);
-        }
 
         if (currentHealth <= 0 && !isDead)
         {
             anim.SetTrigger("Death");
             isDead = true;
-            StartCoroutine(DieDelayTime(0.5f));
+            StartCoroutine(DieDelayTime(.5f));
         }
+    }
 
-        // Àç±ÍÇÔ¼ö
-        void Think()
+    public void Think()
+    {
+        nextMove = Random.Range(-1, 2);
+
+        float nextThinkTime = Random.Range(.5f, 4.5f);
+        Invoke("Think", nextThinkTime);
+
+        if (nextMove != 0)
         {
-            nextMove = Random.Range(-1, 2);
-
-            float nextThinkTime = Random.Range(2f, 5f);
-            Invoke("Think", nextThinkTime);
-
-            if (nextMove != 0)
-            {
-                anim.SetInteger("AnimState", 1);
-                if (nextMove == -1)
-                    transform.eulerAngles = new Vector3(0, 180, 0);
-                else if (nextMove == 1)
-                    transform.eulerAngles = new Vector3(0, 0, 0);
-            }
+            anim.SetInteger("AnimState", 1);
+            if (nextMove == -1)
+                transform.eulerAngles = new Vector3(180, transform.eulerAngles.y + 180, transform.eulerAngles.z + 180);
             else
-            {
-                anim.SetInteger("AnimState", 0);
-            }
-        }
+                transform.eulerAngles = Vector3.zero;
 
-        void Attack()
+        }
+        else
+            anim.SetInteger("AnimState", 0);
+
+    }
+
+    void Attack()
+    {
+
+        int randomAttack = Random.Range(0, 2);
+
+        switch (randomAttack)
         {
-            int randomAttack = Random.Range(0, 2);
-
-            switch (randomAttack)
-            {
-                case 0:
-                    anim.SetTrigger("Attack1");
-                    break;
-                case 1:
-                    anim.SetTrigger("Attack2");
-                    break;
-            }
+            case 0:
+                anim.SetTrigger("Attack1");
+                break;
+            case 1:
+                anim.SetTrigger("Attack2");
+                break;
         }
+    }
 
-        void Die()
-        {
-            if (isDead)
-            {
-                Destroy(gameObject);
-            }
-        }
+    void Die()
+    {
+        if (isDead)
+            Destroy(gameObject);
+    }
 
-        IEnumerator DieDelayTime(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            Die();
-        }
+    IEnumerator DieDelayTime(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Die();
     }
 }
