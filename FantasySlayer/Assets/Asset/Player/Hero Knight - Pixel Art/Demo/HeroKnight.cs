@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Threading;
+using UnityEngine.UI;
+using TMPro;
 
 public class HeroKnight : MonoBehaviour
 {
@@ -30,7 +32,14 @@ public class HeroKnight : MonoBehaviour
     private float m_rollCurrentTime;
     public float climbSpeed = 5f;
     private bool isClimbing = false;
-    public int m_attackDamage = 20;
+    private bool isDead = false; // 사망 여부
+
+    public int maxHealth;
+    public int currentHealth;
+    private int damage = 30;
+
+    public Transform pos;
+    public Vector2 boxSize;
 
     void Start()
     {
@@ -41,6 +50,9 @@ public class HeroKnight : MonoBehaviour
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
+
+        maxHealth = 100;
+        currentHealth = 100;
     }
 
     void Update()
@@ -95,20 +107,18 @@ public class HeroKnight : MonoBehaviour
         m_isWallSliding = (m_wallSensorR1.State() && m_wallSensorR2.State()) || (m_wallSensorL1.State() && m_wallSensorL2.State());
         m_animator.SetBool("WallSlide", m_isWallSliding);
 
-        // 사망
-        /* if (Input.GetKeyDown("e") && !m_rolling)
-         {
-             m_animator.SetBool("noBlood", m_noBlood);
-             m_animator.SetTrigger("Death");
-         }*/
-
-        // 피격
-        /*else if (Input.GetKeyDown("q") && !m_rolling)
-            m_animator.SetTrigger("Hurt");*/
-
         // 공격
         if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
         {
+            Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
+            foreach (Collider2D collider in collider2Ds)
+            {
+                if(collider.tag == "Monster")
+                {
+                    collider.GetComponent<MonsterController>().MonsterTakeDamage(damage);
+                }
+            }
+
             m_currentAttack++;
 
             // 세 번째 공격 이후 1로 다시 루프합니다.
@@ -185,6 +195,35 @@ public class HeroKnight : MonoBehaviour
             m_body2d.velocity = new Vector2(m_body2d.velocity.x, verticalInput * climbSpeed);
             m_animator.SetInteger("AnimState", 1); // 삭제 확인
         }
+
+        // 사망
+        if (currentHealth <= 0 && !isDead)
+        {
+            m_animator.SetTrigger("Death");
+            isDead = true;
+
+            StartCoroutine(DieDelayTime(1f));
+        }
+    }
+    IEnumerator DieDelayTime(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Die();
+    }
+
+    IEnumerator DieAinDelayTime(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+    }
+
+    void Die()
+    {
+        if (isDead)
+        {
+            // 사망시 UI 생성
+            StartCoroutine(DieAinDelayTime(100f));
+            m_animator.enabled = false;
+        }
     }
 
     // 슬라이드 애니메이션에서 호출됩니다.
@@ -206,25 +245,12 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    /*void AE_Attack()
+    public void PlayerTakeDamage(int damage)
     {
-        float attackRange = 1f;
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, new Vector2(m_facingDirection, 0), attackRange);
-
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.transform != null && ((1 << hit.transform.gameObject.layer) & LayerMask.GetMask("Skeleton", "Mushroom")) != 0)
-            {
-                MonsterController monsterScript = hit.transform.GetComponent<MonsterController>();
-                if (monsterScript != null)
-                {
-                    monsterScript.TakeDamage(m_attackDamage);
-                }
-            }
-        }
+        currentHealth = currentHealth - damage;
+        m_animator.SetTrigger("Hit");
     }
-*/
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Ladder")
@@ -243,4 +269,10 @@ public class HeroKnight : MonoBehaviour
             m_animator.SetInteger("AnimState", 0);
         }
     }
+
+    /*private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(pos.position, boxSize);
+    }*/
 }   
