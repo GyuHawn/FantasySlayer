@@ -17,9 +17,7 @@ public class MoveCamera : MonoBehaviour
             checkPlayer = true;
         }
 
-        transform.position = new Vector3(player.transform.position.x + offset.x,
-                                         player.transform.position.y + offset.y,
-                                         transform.position.z);
+        transform.position = new Vector3(player.transform.position.x + offset.x, player.transform.position.y + offset.y, transform.position.z);
     }
 
     void PlayerCheck()

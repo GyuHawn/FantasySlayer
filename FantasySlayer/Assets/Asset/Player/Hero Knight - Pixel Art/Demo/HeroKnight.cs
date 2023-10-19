@@ -3,9 +3,12 @@ using System.Collections;
 using System.Threading;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class HeroKnight : MonoBehaviour
 {
+    private Trap trap;
+
     [SerializeField] float m_speed = 4.0f;
     [SerializeField] int m_jumpCount = 2;
     [SerializeField] float m_jumpForce = 6.0f;
@@ -50,6 +53,7 @@ public class HeroKnight : MonoBehaviour
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
+       // trap = transform.Find("Trap").GetComponentInChildren<Trap>();
 
         maxHealth = 100;
         currentHealth = 100;
@@ -201,7 +205,7 @@ public class HeroKnight : MonoBehaviour
         {
             m_animator.SetTrigger("Death");
             isDead = true;
-
+            UIManager.gameOver();
             StartCoroutine(DieDelayTime(1f));
         }
     }
@@ -219,7 +223,7 @@ public class HeroKnight : MonoBehaviour
     void Die()
     {
         if (isDead)
-        {
+        {     
             // 사망시 UI 생성
             StartCoroutine(DieAinDelayTime(100f));
             m_animator.enabled = false;
@@ -269,6 +273,14 @@ public class HeroKnight : MonoBehaviour
             m_animator.SetInteger("AnimState", 0);
         }
     }
+
+    /*private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Trap"))
+        {
+            currentHealth = currentHealth - trap.tDamage;
+        }
+    }*/
 
     /*private void OnDrawGizmos()
     {

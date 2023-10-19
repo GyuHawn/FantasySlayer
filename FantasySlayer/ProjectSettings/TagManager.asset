@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Ladder
   - Monster
+  - Trap
+  - Arrow
+  - Delete
+  - MoveMap
+  - EndMap
   layers:
   - Default
   - TransparentFX
