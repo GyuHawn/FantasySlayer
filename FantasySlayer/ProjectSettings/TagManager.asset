@@ -11,6 +11,7 @@ TagManager:
   - Delete
   - MoveMap
   - EndMap
+  - Boss
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - Flying eye
   - Goblin
   - Player
-  - 
+  - Boss
   - 
   - 
   - 

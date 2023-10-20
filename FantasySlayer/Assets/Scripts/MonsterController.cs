@@ -66,59 +66,81 @@ public class MonsterController : MonoBehaviour
             nextMoveTime += Random.Range(.5f, 4.5f); // 다음번에 바꿔줄 시각 결정
         }
 
-        // 이동
-        bool isPlayerInRange = false;
-        Vector3 playerDirection = Vector3.zero;
-
-        Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(mpos.position, mBoxSize, 0);
-        foreach (Collider2D collider in collider2Ds)
+        if (gameObject.tag == "Boss")
         {
-            if (collider.tag == "Player")
+            Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(mpos.position, mBoxSize, 0);
+            foreach (Collider2D collider in collider2Ds)
             {
-                isPlayerInRange = true;
-                playerDirection = (collider.transform.position - transform.position).normalized;
-                break;
+                if (collider.tag == "Player")
+                {
+                    Vector3 playerDirection = (collider.transform.position - transform.position).normalized;
+
+                    // 몬스터가 플레이어를 바라보도록 회전
+                    if (playerDirection.x > 0)
+                        transform.eulerAngles = new Vector3(0, 0, 0);
+                    else if (playerDirection.x < 0)
+                        transform.eulerAngles = new Vector3(0, 180, 0);
+
+                    break;
+                }
             }
-        }
-
-        if (isPlayerInRange)
-        {
-            // 플레이어가 있으면 플레이어의 방향으로 이동  
-            rigid.velocity = new Vector2(playerDirection.x * spd, rigid.velocity.y);
-
-            // 애니메이션 상태 변경  
-            anim.SetInteger("AnimState", 1);
-
-            // 몬스터가 플레이어를 바라보도록 회전
-            if (playerDirection.x > 0)
-                transform.eulerAngles = new Vector3(0, 0, 0);
-            else if (playerDirection.x < 0)
-                transform.eulerAngles = new Vector3(0, 180, 0);
         }
         else
         {
-            // 바닥 확인
-            Vector2 frontVec = new Vector2(rigid.position.x + nextMove, rigid.position.y);
-            Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
-            RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 2, LayerMask.GetMask("Floor"));
+            // 이동
+            bool isPlayerInRange = false;
+            Vector3 playerDirection = Vector3.zero;
 
-            if (rayHit.collider == null)
-                nextMove *= -1;
-
-            if (nextMove != 0)
+            Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(mpos.position, mBoxSize, 0);
+            foreach (Collider2D collider in collider2Ds)
             {
-                anim.SetInteger("AnimState", 1);
-                if (nextMove == -1)
-                    transform.eulerAngles = new Vector3(0, 180);
-                else if (nextMove == 1)
-                    transform.eulerAngles = new Vector3(0, 0, 0);
+                if (collider.tag == "Player")
+                {
+                    isPlayerInRange = true;
+                    playerDirection = (collider.transform.position - transform.position).normalized;
+                    break;
+                }
+            }
 
-                rigid.velocity = new Vector2(nextMove * spd, rigid.velocity.y);
+            if (isPlayerInRange)
+            {
+                // 플레이어가 있으면 플레이어의 방향으로 이동  
+                rigid.velocity = new Vector2(playerDirection.x * spd, rigid.velocity.y);
+
+                // 애니메이션 상태 변경  
+                anim.SetInteger("AnimState", 1);
+
+                // 몬스터가 플레이어를 바라보도록 회전
+                if (playerDirection.x > 0)
+                    transform.eulerAngles = new Vector3(0, 0, 0);
+                else if (playerDirection.x < 0)
+                    transform.eulerAngles = new Vector3(0, 180, 0);
             }
             else
             {
-                anim.SetInteger("AnimState", 0);
-                rigid.velocity = Vector2.zero;
+                // 바닥 확인
+                Vector2 frontVec = new Vector2(rigid.position.x + nextMove, rigid.position.y);
+                Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
+                RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 2, LayerMask.GetMask("Floor"));
+
+                if (rayHit.collider == null)
+                    nextMove *= -1;
+
+                if (nextMove != 0)
+                {
+                    anim.SetInteger("AnimState", 1);
+                    if (nextMove == -1)
+                        transform.eulerAngles = new Vector3(0, 180);
+                    else if (nextMove == 1)
+                        transform.eulerAngles = new Vector3(0, 0, 0);
+
+                    rigid.velocity = new Vector2(nextMove * spd, rigid.velocity.y);
+                }
+                else
+                {
+                    anim.SetInteger("AnimState", 0);
+                    rigid.velocity = Vector2.zero;
+                }
             }
         }
 
@@ -206,3 +228,4 @@ public class MonsterController : MonoBehaviour
         Gizmos.DrawWireCube(mpos.position, mBoxSize);
     }
 }
+    

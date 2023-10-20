@@ -7,11 +7,12 @@ public class PortalScript : MonoBehaviour
 {
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Player" && Input.GetKeyDown(KeyCode.F))
+        //if (other.gameObject.tag == "Player" && Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             if (SceneManager.GetActiveScene().name == "Main")
             {
-                SceneManager.LoadScene("Stage1-2");
+                SceneManager.LoadScene("Stage1-1");
             }
             if (SceneManager.GetActiveScene().name == "Stage1-1")
             {

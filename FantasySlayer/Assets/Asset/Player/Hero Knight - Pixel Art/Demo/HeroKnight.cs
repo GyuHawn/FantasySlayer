@@ -108,16 +108,13 @@ public class HeroKnight : MonoBehaviour
 
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
 
-        m_isWallSliding = (m_wallSensorR1.State() && m_wallSensorR2.State()) || (m_wallSensorL1.State() && m_wallSensorL2.State());
-        m_animator.SetBool("WallSlide", m_isWallSliding);
-
         // 공격
         if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
         {
             Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
             foreach (Collider2D collider in collider2Ds)
             {
-                if(collider.tag == "Monster")
+                if (collider.tag == "Monster" || collider.tag == "Boss")
                 {
                     collider.GetComponent<MonsterController>().MonsterTakeDamage(damage);
                 }
