@@ -22,10 +22,10 @@ public class Trap : MonoBehaviour
             HeroKnight player = collision.gameObject.GetComponent<HeroKnight>();
             reconfirm = true;
         }
-        /*if (collision.gameObject.CompareTag("EndMap"))
+        if (collision.gameObject.CompareTag("EndMap"))
         {
             reconfirm = false;
-        }*/
+        }
 
         if (collision.gameObject.CompareTag("Player"))
         {

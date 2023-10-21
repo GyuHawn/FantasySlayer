@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 9208599618574489179}
   - component: {fileID: 1307447529689243911}
   - component: {fileID: 7918504391085515694}
+  - component: {fileID: 7274527924590406633}
   m_Layer: 13
   m_Name: Fire
-  m_TagString: Untagged
+  m_TagString: Skill1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 7394889302505113867}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -114,7 +115,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0.008857608, y: 0.08857381}
@@ -130,3 +131,16 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.337681, y: 1.7451208}
   m_EdgeRadius: 0
+--- !u!114 &7274527924590406633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7394889302505113867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4ccce51870386545967d80aeab4f856, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sdamage: 20

@@ -12,6 +12,9 @@ TagManager:
   - MoveMap
   - EndMap
   - Boss
+  - Skill1
+  - Skill2
+  - Skill3
   layers:
   - Default
   - TransparentFX

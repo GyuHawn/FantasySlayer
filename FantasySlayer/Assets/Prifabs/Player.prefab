@@ -550,8 +550,8 @@ MonoBehaviour:
   m_noBlood: 0
   m_slideDust: {fileID: 0}
   climbSpeed: 5
-  maxHealth: 100
-  currentHealth: 100
+  maxHealth: 10000
+  currentHealth: 10000
   pos: {fileID: 1566475753384833898}
   boxSize: {x: 1, y: 1.3}
 --- !u!1 &6762220534823416067

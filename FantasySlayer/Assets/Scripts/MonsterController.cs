@@ -31,11 +31,16 @@ public class MonsterController : MonoBehaviour
     private Rigidbody2D rigid;
     private Animator anim;
 
+    // 보스 몬스터 스킬 관련
+    public BossSkill bossSkill;
+
     private void Awake()
     {
         player = GameObject.Find("Player").GetComponent<HeroKnight>();
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+
+        bossSkill = GetComponent<BossSkill>();
 
         maxHealth = 100;
         currentHealth = 100;
@@ -68,6 +73,11 @@ public class MonsterController : MonoBehaviour
 
         if (gameObject.tag == "Boss")
         {
+            if (bossSkill != null && bossSkill.isUsingSecondSkill)
+            {
+                return;
+            }
+
             Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(mpos.position, mBoxSize, 0);
             foreach (Collider2D collider in collider2Ds)
             {

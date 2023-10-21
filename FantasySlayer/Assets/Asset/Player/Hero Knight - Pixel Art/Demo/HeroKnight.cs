@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Threading;
-using UnityEngine.UI;
 using TMPro;
 using UnityEngine.UIElements;
 
 public class HeroKnight : MonoBehaviour
 {
     private Trap trap;
+    public PlayerUI playerUI;
 
     [SerializeField] float m_speed = 4.0f;
     [SerializeField] int m_jumpCount = 2;
@@ -53,7 +55,11 @@ public class HeroKnight : MonoBehaviour
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
-       // trap = transform.Find("Trap").GetComponentInChildren<Trap>();
+        if (playerUI != null) 
+        { 
+            playerUI = GameObject.Find("CurrentHealth").GetComponent<PlayerUI>();
+        }
+
 
         maxHealth = 100;
         currentHealth = 100;
@@ -250,6 +256,13 @@ public class HeroKnight : MonoBehaviour
     {
         currentHealth = currentHealth - damage;
         m_animator.SetTrigger("Hit");
+        UpdateHealthBar(currentHealth);
+    }
+
+    void UpdateHealthBar(float currentHealth)
+    {
+        float ratio = currentHealth / maxHealth;
+        playerUI.healthBar.fillAmount = ratio;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -271,14 +284,14 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    /*private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Trap"))
         {
             currentHealth = currentHealth - trap.tDamage;
         }
-    }*/
-
+    }
+    
     /*private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
