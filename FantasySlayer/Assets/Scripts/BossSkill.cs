@@ -31,14 +31,14 @@ public class BossSkill : MonoBehaviour
         availableSkills = new List<Func<IEnumerator>>(skills);
         isUsingSecondSkill = false;
 
-        UseSkill(Skill1);
+        //UseSkill(Skill1);
 
-        // StartCoroutine(StartSkills());
+        StartCoroutine(StartSkills());
     }
 
     private IEnumerator StartSkills()
     {
-        yield return new WaitForSeconds(0);
+        yield return new WaitForSeconds(2);
 
         while (true)
         {

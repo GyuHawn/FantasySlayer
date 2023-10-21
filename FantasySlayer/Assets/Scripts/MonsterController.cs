@@ -4,8 +4,7 @@ using System.Collections;
 public class MonsterController : MonoBehaviour
 {
     private HeroKnight player;
-    private MonsterController m;
-
+    private BossUI bossUI;
     public float spd = 5f;
 
     public int maxHealth;
@@ -37,13 +36,11 @@ public class MonsterController : MonoBehaviour
     private void Awake()
     {
         player = GameObject.Find("Player").GetComponent<HeroKnight>();
+        bossUI = GameObject.FindObjectOfType<BossUI>();
         rigid = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
 
         bossSkill = GetComponent<BossSkill>();
-
-        maxHealth = 100;
-        currentHealth = 100;
 
         nextMoveTime = Time.time + Random.Range(.5f, 4.5f); // 초기 이동 시간 설정
     }
@@ -213,8 +210,13 @@ public class MonsterController : MonoBehaviour
 
     public void MonsterTakeDamage(int damage)
     {
-        currentHealth = currentHealth - damage;
+        currentHealth -= damage;
         anim.SetTrigger("Hit");
+
+        if (bossUI != null)
+        {
+            bossUI.UpdateBossHealthBar();
+        }
     }
 
     void Die()

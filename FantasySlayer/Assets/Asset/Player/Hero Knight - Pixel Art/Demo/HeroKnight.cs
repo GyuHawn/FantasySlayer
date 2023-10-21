@@ -18,6 +18,8 @@ public class HeroKnight : MonoBehaviour
     [SerializeField] bool m_noBlood = false;
     [SerializeField] GameObject m_slideDust;
 
+    private DynamicJoystick joy;
+
     private Animator m_animator;
     private Rigidbody2D m_body2d;
     private Sensor_HeroKnight m_groundSensor;
@@ -41,6 +43,7 @@ public class HeroKnight : MonoBehaviour
 
     public int maxHealth;
     public int currentHealth;
+    public TMP_Text hpText;
     private int damage = 30;
 
     public Transform pos;
@@ -55,9 +58,22 @@ public class HeroKnight : MonoBehaviour
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
-        if (playerUI != null) 
-        { 
-            playerUI = GameObject.Find("CurrentHealth").GetComponent<PlayerUI>();
+
+        GameObject hpTextObject = GameObject.Find("HPText");
+        if (hpTextObject != null)
+        {
+            hpText = hpTextObject.GetComponent<TMP_Text>();
+        }
+
+        GameObject joystickObject = GameObject.Find("Dynamic Joystick");
+        if (joystickObject != null)
+        {
+            joy = joystickObject.GetComponent<DynamicJoystick>();
+        }
+
+        if (playerUI == null)
+        {
+            playerUI = FindObjectOfType<PlayerUI>();
         }
 
 
@@ -67,6 +83,12 @@ public class HeroKnight : MonoBehaviour
 
     void Update()
     {
+        // 조이스틱 입력
+        float inputjX = joy.Horizontal;
+       // float inputjY = joy.Vertical;
+
+        hpText.text = "HP : " + currentHealth.ToString() + " / " + maxHealth.ToString();
+
         // 공격 콤보를 제어하는 ​​타이머 증가
         m_timeSinceAttack += Time.deltaTime;
 
@@ -96,55 +118,59 @@ public class HeroKnight : MonoBehaviour
         float inputX = Input.GetAxis("Horizontal");
 
         // 걷는 방향에 따라 스프라이트 방향을 바꿉니다.
-        if (inputX > 0)
+        if (inputX > 0 || inputjX > 0)
         {
             GetComponent<SpriteRenderer>().flipX = false;
             m_facingDirection = 1;
         }
 
-        else if (inputX < 0)
+        else if (inputX < 0 || inputjX < 0)
         {
             GetComponent<SpriteRenderer>().flipX = true;
             m_facingDirection = -1;
         }
 
-        // 이동
+        // 키보드 이동
+        /*if (!m_rolling)
+            m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);*/
+
+        // 조이스틱 이동
         if (!m_rolling)
-            m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
+            m_body2d.velocity = new Vector2(inputjX * m_speed, m_body2d.velocity.y);
 
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
 
         // 공격
-        if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
-        {
-            Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
-            foreach (Collider2D collider in collider2Ds)
-            {
-                if (collider.tag == "Monster" || collider.tag == "Boss")
-                {
-                    collider.GetComponent<MonsterController>().MonsterTakeDamage(damage);
-                }
-            }
+        /* if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
+         {
+             Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
+             foreach (Collider2D collider in collider2Ds)
+             {
+                 if (collider.tag == "Monster" || collider.tag == "Boss")
+                 {
+                     collider.GetComponent<MonsterController>().MonsterTakeDamage(damage);
+                 }
+             }
 
-            m_currentAttack++;
+             m_currentAttack++;
 
-            // 세 번째 공격 이후 1로 다시 루프합니다.
-            if (m_currentAttack > 3)
-                m_currentAttack = 1;
+             // 세 번째 공격 이후 1로 다시 루프합니다.
+             if (m_currentAttack > 3)
+                 m_currentAttack = 1;
 
-            // 마지막 공격 이후 시간이 너무 길면 공격 콤보를 재설정합니다.
-            if (m_timeSinceAttack > 1.0f)
-                m_currentAttack = 1;
+             // 마지막 공격 이후 시간이 너무 길면 공격 콤보를 재설정합니다.
+             if (m_timeSinceAttack > 1.0f)
+                 m_currentAttack = 1;
 
-            // 세 가지 공격 애니메이션 중 하나를 호출합니다.(Attack 1,2,3)
-            m_animator.SetTrigger("Attack" + m_currentAttack);
+             // 세 가지 공격 애니메이션 중 하나를 호출합니다.(Attack 1,2,3)
+             m_animator.SetTrigger("Attack" + m_currentAttack);
 
-            // 타이머 재설정
-            m_timeSinceAttack = 0.0f;
-        }
+             // 타이머 재설정
+             m_timeSinceAttack = 0.0f;
+         }*/
 
         // 막기
-        else if (Input.GetMouseButtonDown(1) && !m_rolling)
+        if (Input.GetMouseButtonDown(1) && !m_rolling)
         {
             m_animator.SetTrigger("Block");
             m_animator.SetBool("IdleBlock", true);
@@ -162,7 +188,7 @@ public class HeroKnight : MonoBehaviour
         }
 
         // 점프
-        else if (Input.GetKeyDown("space") && !m_rolling && (m_grounded || m_currentJumpCount < m_jumpCount))
+       /* else if (Input.GetKeyDown("space") && !m_rolling && (m_grounded || m_currentJumpCount < m_jumpCount))
         {
             float jumpForce = m_jumpForce;
 
@@ -176,10 +202,10 @@ public class HeroKnight : MonoBehaviour
             m_animator.SetBool("Grounded", m_grounded);
             m_body2d.velocity = new Vector2(m_body2d.velocity.x, jumpForce);
             m_groundSensor.Disable(0.2f);
-        }
+        }*/
 
         // 달리기
-        else if (Mathf.Abs(inputX) > Mathf.Epsilon)
+        else if (Mathf.Abs(inputX) > Mathf.Epsilon || Mathf.Abs(inputjX) > Mathf.Epsilon)
         {
             // 타이머 재설정
             m_delayToIdle = 0.05f;
@@ -196,12 +222,13 @@ public class HeroKnight : MonoBehaviour
         }
 
         // 사다리
-        if (isClimbing)
+        /*if (isClimbing)
         {
             float verticalInput = Input.GetAxis("Vertical");
             m_body2d.velocity = new Vector2(m_body2d.velocity.x, verticalInput * climbSpeed);
             m_animator.SetInteger("AnimState", 1); // 삭제 확인
-        }
+        }*/
+        
 
         // 사망
         if (currentHealth <= 0 && !isDead)
@@ -237,7 +264,7 @@ public class HeroKnight : MonoBehaviour
     void AE_SlideDust()
     {
         Vector3 spawnPosition;
-
+ 
         if (m_facingDirection == 1)
             spawnPosition = m_wallSensorR2.transform.position;
         else
@@ -291,10 +318,71 @@ public class HeroKnight : MonoBehaviour
             currentHealth = currentHealth - trap.tDamage;
         }
     }
-    
+
     /*private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(pos.position, boxSize);
     }*/
+
+    // 모바일용 기능버튼 코드
+    public void Jump()
+    {
+            if (!m_rolling && (m_grounded || m_currentJumpCount < m_jumpCount))
+            {
+                float jumpForce = m_jumpForce;
+
+                if (!m_grounded)
+                {
+                    ++m_currentJumpCount;
+                }
+
+                m_animator.SetTrigger("Jump");
+                m_grounded = false;
+                m_animator.SetBool("Grounded", m_grounded);
+                m_body2d.velocity = new Vector2(m_body2d.velocity.x, jumpForce);
+                m_groundSensor.Disable(0.2f);
+            }
+    }
+
+    public void Attack()
+    {
+        if (m_timeSinceAttack > 0.25f && !m_rolling)
+        {
+            Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
+            foreach (Collider2D collider in collider2Ds)
+            {
+                if (collider.tag == "Monster" || collider.tag == "Boss")
+                {
+                    collider.GetComponent<MonsterController>().MonsterTakeDamage(damage);
+                }
+            }
+
+            m_currentAttack++;
+
+            // 세 번째 공격 이후 1로 다시 루프합니다.
+            if (m_currentAttack > 3)
+                m_currentAttack = 1;
+
+            // 마지막 공격 이후 시간이 너무 길면 공격 콤보를 재설정합니다.
+            if (m_timeSinceAttack > 1.0f)
+                m_currentAttack = 1;
+
+            // 세 가지 공격 애니메이션 중 하나를 호출합니다.(Attack 1,2,3)
+            m_animator.SetTrigger("Attack" + m_currentAttack);
+
+            // 타이머 재설정
+            m_timeSinceAttack = 0.0f;
+        }
+    }
+
+    public void Climb(bool isPressed)
+    {
+        if (isClimbing)
+        {
+            float verticalInput = isPressed ? 1f : -1f;
+            m_body2d.velocity = new Vector2(m_body2d.velocity.x, verticalInput * climbSpeed);
+            m_animator.SetInteger("AnimState", 1);
+        }
+    }
 }   

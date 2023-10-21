@@ -375,6 +375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f5034bc83802944c9bca57c55e08978, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerUI: {fileID: 0}
   m_speed: 4
   m_jumpCount: 2
   m_jumpForce: 7.5
@@ -382,8 +383,8 @@ MonoBehaviour:
   m_noBlood: 0
   m_slideDust: {fileID: 1038168246061390451, guid: 8b8c8cc6774fb074cb9139cc631b108e, type: 3}
   climbSpeed: 5
-  maxHealth: 0
-  currentHealth: 0
+  maxHealth: 200
+  currentHealth: 200
   pos: {fileID: 0}
   boxSize: {x: 0, y: 0}
 --- !u!95 &8983451254598062506
@@ -543,6 +544,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f5034bc83802944c9bca57c55e08978, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerUI: {fileID: 0}
   m_speed: 4
   m_jumpCount: 2
   m_jumpForce: 7.5
