@@ -33,7 +33,7 @@ public class PortalScript : MonoBehaviour
             {
                 if (SceneManager.GetActiveScene().name == "Main")
                 {
-                    SceneManager.LoadScene("Stage1-3");
+                    SceneManager.LoadScene("Stage1-1");
                 }
                 else if (SceneManager.GetActiveScene().name == "Stage1-1")
                 {
