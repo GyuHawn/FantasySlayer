@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine;
 
 public class PlayerSpwan : MonoBehaviour
 {
@@ -9,6 +7,7 @@ public class PlayerSpwan : MonoBehaviour
     public GameObject spawnPoint;
 
     private static bool isSpawn = false;
+    private GameObject newPlayer;
 
     void Start()
     {
@@ -21,9 +20,18 @@ public class PlayerSpwan : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    public void Update()
+    {
+        if (SceneManager.GetActiveScene().name == "MainMeun")
+        {
+            Destroy(newPlayer);
+            isSpawn = false;
+        }
+    }
+
     void SpawnPlayer()
     {
-        GameObject newPlayer = Instantiate(mPlayer, spawnPoint.transform.position, Quaternion.identity);
+        newPlayer = Instantiate(mPlayer, spawnPoint.transform.position, Quaternion.identity);
         newPlayer.name = "Player";
         DontDestroyOnLoad(newPlayer);
     }

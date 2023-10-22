@@ -52,7 +52,7 @@ public class BossSkill : MonoBehaviour
 
             availableSkills.RemoveAt(randomIndex);
 
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(5);
         }
     }
 

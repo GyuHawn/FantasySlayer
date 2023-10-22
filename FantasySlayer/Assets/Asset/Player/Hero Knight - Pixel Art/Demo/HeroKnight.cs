@@ -13,7 +13,7 @@ public class HeroKnight : MonoBehaviour
 
     [SerializeField] float m_speed = 4.0f;
     [SerializeField] int m_jumpCount = 2;
-    [SerializeField] float m_jumpForce = 6.0f;
+    [SerializeField] float m_jumpForce = 7.5f;
     [SerializeField] float m_rollForce = 6.0f;
     [SerializeField] bool m_noBlood = false;
     [SerializeField] GameObject m_slideDust;
@@ -49,8 +49,13 @@ public class HeroKnight : MonoBehaviour
     public Transform pos;
     public Vector2 boxSize;
 
+    Collider2D[] collider2Ds;
+
     void Start()
     {
+        m_jumpForce = 7.5f;
+        m_jumpCount = 1;
+
         m_animator = GetComponent<Animator>();
         m_body2d = GetComponent<Rigidbody2D>();
         m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_HeroKnight>();
@@ -58,6 +63,7 @@ public class HeroKnight : MonoBehaviour
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
+        pos = GameObject.Find("Melee").transform;
 
         GameObject hpTextObject = GameObject.Find("HPText");
         if (hpTextObject != null)
@@ -85,8 +91,8 @@ public class HeroKnight : MonoBehaviour
     {
         // 조이스틱 입력
         float inputjX = joy.Horizontal;
-       // float inputjY = joy.Vertical;
-
+        // float inputjY = joy.Vertical;
+        
         hpText.text = "HP : " + currentHealth.ToString() + " / " + maxHealth.ToString();
 
         // 공격 콤보를 제어하는 ​​타이머 증가
@@ -140,8 +146,10 @@ public class HeroKnight : MonoBehaviour
 
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
 
-        // 공격
-        /* if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
+
+        //공격
+        collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
+        /*if (*//*Input.GetMouseButtonDown(0) &&*//*m_timeSinceAttack > 0.25f && !m_rolling)
          {
              Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
              foreach (Collider2D collider in collider2Ds)
@@ -170,22 +178,22 @@ public class HeroKnight : MonoBehaviour
          }*/
 
         // 막기
-        if (Input.GetMouseButtonDown(1) && !m_rolling)
+        /*if (Input.GetMouseButtonDown(1) && !m_rolling)
         {
             m_animator.SetTrigger("Block");
             m_animator.SetBool("IdleBlock", true);
         }
 
         else if (Input.GetMouseButtonUp(1))
-            m_animator.SetBool("IdleBlock", false);
+            m_animator.SetBool("IdleBlock", false);*/
 
         // 구르기
-        else if (Input.GetKeyDown("left shift") && !m_rolling && !m_isWallSliding)
+        /*else if (Input.GetKeyDown("left shift") && !m_rolling && !m_isWallSliding)
         {
             m_rolling = true;
             m_animator.SetTrigger("Roll");
             m_body2d.velocity = new Vector2(m_facingDirection * m_rollForce, m_body2d.velocity.y);
-        }
+        }*/
 
         // 점프
        /* else if (Input.GetKeyDown("space") && !m_rolling && (m_grounded || m_currentJumpCount < m_jumpCount))
@@ -205,7 +213,7 @@ public class HeroKnight : MonoBehaviour
         }*/
 
         // 달리기
-        else if (Mathf.Abs(inputX) > Mathf.Epsilon || Mathf.Abs(inputjX) > Mathf.Epsilon)
+        if (Mathf.Abs(inputX) > Mathf.Epsilon || Mathf.Abs(inputjX) > Mathf.Epsilon)
         {
             // 타이머 재설정
             m_delayToIdle = 0.05f;
@@ -328,28 +336,30 @@ public class HeroKnight : MonoBehaviour
     // 모바일용 기능버튼 코드
     public void Jump()
     {
-            if (!m_rolling && (m_grounded || m_currentJumpCount < m_jumpCount))
+        if (!m_rolling && (m_grounded || m_currentJumpCount < m_jumpCount))
+        {
+            float jumpForce = m_jumpForce;
+
+            if (!m_grounded)
             {
-                float jumpForce = m_jumpForce;
-
-                if (!m_grounded)
-                {
-                    ++m_currentJumpCount;
-                }
-
-                m_animator.SetTrigger("Jump");
-                m_grounded = false;
-                m_animator.SetBool("Grounded", m_grounded);
-                m_body2d.velocity = new Vector2(m_body2d.velocity.x, jumpForce);
-                m_groundSensor.Disable(0.2f);
+                ++m_currentJumpCount;
             }
+
+            m_animator.SetTrigger("Jump");
+            m_grounded = false;
+            m_animator.SetBool("Grounded", m_grounded);
+            m_body2d.velocity = new Vector2(m_body2d.velocity.x, jumpForce);
+            m_groundSensor.Disable(0.2f);
+        }
     }
 
     public void Attack()
     {
+        collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
+
         if (m_timeSinceAttack > 0.25f && !m_rolling)
         {
-            Collider2D[] collider2Ds = Physics2D.OverlapBoxAll(pos.position, boxSize, 0);
+
             foreach (Collider2D collider in collider2Ds)
             {
                 if (collider.tag == "Monster" || collider.tag == "Boss")
@@ -373,16 +383,6 @@ public class HeroKnight : MonoBehaviour
 
             // 타이머 재설정
             m_timeSinceAttack = 0.0f;
-        }
-    }
-
-    public void Climb(bool isPressed)
-    {
-        if (isClimbing)
-        {
-            float verticalInput = isPressed ? 1f : -1f;
-            m_body2d.velocity = new Vector2(m_body2d.velocity.x, verticalInput * climbSpeed);
-            m_animator.SetInteger("AnimState", 1);
         }
     }
 }   

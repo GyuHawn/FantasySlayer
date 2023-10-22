@@ -28,9 +28,4 @@ public class PlayerFuntionButton : MonoBehaviour
     {
         knight.Attack();
     }
-
-    public void ClimbButtonMoved(bool isPressed)
-    {
-        knight.Climb(isPressed);
-    }
 }

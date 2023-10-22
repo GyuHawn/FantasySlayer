@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerUI : MonoBehaviour
 {
@@ -18,8 +19,13 @@ public class PlayerUI : MonoBehaviour
     private void Update()
     {
         back.SetActive(true);
-    }
 
+        if (SceneManager.GetActiveScene().name == "MainMeun")
+        {
+            Destroy(hp.transform.root.gameObject);
+        }
+    }
+    
     void UpdateHealthBar()
     {
         float ratio = currentHealth / maxHealth;

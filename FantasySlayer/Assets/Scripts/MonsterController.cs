@@ -231,13 +231,13 @@ public class MonsterController : MonoBehaviour
         Die();
     }
 
-    private void OnDrawGizmos()
+    /*private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(apos.position, aBoxSize);
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(mpos.position, mBoxSize);
-    }
+    }*/
 }
     
